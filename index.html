@@ -2,6 +2,7 @@
 <html lang="ja">
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>WF15_04_ある日の食卓・サィメィゲン</title>
         <link rel="stylesheet" href="css/style.css">
     </head>
@@ -9,6 +10,7 @@
         <div class="wrapper">
             <section id="top">
                 <header>
+                    <button id="darkModeToggle">🌃夜間モード</button>
                     <h1>ある日の食卓・サィメィゲン</h1>
                     <div class="mainvisual">
                         <img src="images/top.jpg" alt="MainVisual">
@@ -99,35 +101,107 @@
                         <h3><a href="#buttom">底</a></h3>
                     </section>
                     <section class="me">
-                        <a href="#top"><img src="images/head.jpg" alt="Profile Picture" class="light"> </a>
+                        <img src="images/head.jpg" alt="Profile Picture" class="light" id="profileBtn">
                         <h1> TSAIMINGYEN(サイメイゲン)</h1>
                     </section>
                 </aside>
+                <button id="backToTop">↑ Top</button>
             </div>
-            <footer>
+            <footer class="footer_top">
                 <section id="buttom">
                     <small>ある日の食卓・サィメィゲン<br>
                     Copyright 2025 Murakami Sachiko</small>
                     <h2><a href="https://www.hal.ac.jp/tokyo" target="_blank">HAL東京公式サイト</a></h2>
                 </section>
             </footer>
+            <div id="lightbox" class="lightbox">
+                <img id="lightbox-img" src="" alt="拡大画像">
+            </div>
+            <div id="profileModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>自己紹介</h2>
+                <p>こんにちは！TSAIMINGYEN（サイメイゲン）です。<br>
+                台湾出身で、日本で情報処理を学んでいます。<br>
+                食べることとゲームが大好きです🍜🎮</p>
+            </div>
         </div>
-        <div class="">
 
-        </div>
-        <div>
-
-        </div>
         <script>
+            const lightbox = document.getElementById("lightbox");
+            const lightboxImg = document.getElementById("lightbox-img");
+            const contents = document.querySelectorAll('.content');
+            const toggleBtn = document.getElementById('darkModeToggle');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedTheme = localStorage.getItem('theme');
+            const topBtn = document.getElementById("backToTop");
+            const profileBtn = document.getElementById("profileBtn");
+            const profileModal = document.getElementById("profileModal");
+            const closeBtn = document.querySelector(".modal .close");
+
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute("href")).scrollIntoView({
-                    behavior: "smooth"
+                        e.preventDefault();
+                        document.querySelector(this.getAttribute("href")).scrollIntoView({
+                        behavior: "smooth"
+                    });
                 });
             });
-        });
-        </script>
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.2 });
 
+            contents.forEach(content => {
+                observer.observe(content);
+            });
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.body.classList.add('dark-mode');
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+            window.addEventListener("scroll", () => {
+                topBtn.style.display = window.scrollY > 300 ? "block" : "none";
+            });
+            topBtn.addEventListener("click", () => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+            document.querySelectorAll(".content-img img").forEach(img => {
+                img.addEventListener("click", () => {
+                    lightboxImg.src = img.src;
+                    lightbox.style.display = "flex";
+                });
+            });
+
+            lightbox.addEventListener("click", () => {
+                lightbox.style.display = "none";
+                lightboxImg.src = "";
+            });
+            profileBtn.addEventListener("click", () => {
+                profileModal.style.display = "flex";
+            });
+
+            closeBtn.addEventListener("click", () => {
+                profileModal.style.display = "none";
+            });
+
+            window.addEventListener("click", (e) => {
+                if (e.target === profileModal) {
+                    profileModal.style.display = "none";
+                }
+            });
+        </script>
     </body>
 </html>
